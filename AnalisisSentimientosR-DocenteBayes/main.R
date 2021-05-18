@@ -1,0 +1,36 @@
+#Adicionando paquetes y modulos
+library(NLP)
+library(ggplot2)
+library(tm)
+source('classify_polarity.R')
+source('create_matrix.R')
+source('classify_emotion.R')
+
+corpus2 <- read.csv("data/StemCorpus.csv")
+# clasificación de la emocion
+class_emo = classify_emotion(corpus2$text, algorithm="bayes", prior=1.0)
+
+ emotion = class_emo[,7]
+# Seteando no definidos
+emotion[is.na(emotion)] = "unknown"
+
+# Seteando polaridad
+class_pol = classify_polarity(corpus2$text, algorithm="bayes", minWordLength = 1)
+polarity = class_pol[,4]
+
+#PROBANDO C?DIGO DE NAIVE BAYES
+ sent_df = data.frame(text=corpus2, emotion=emotion,polarity=polarity, stringsAsFactors=FALSE)
+
+ #Ordenando el Dataframe
+sent_df = within(sent_df,
+emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
+
+
+# Grafico de sentimientos
+ggplot(sent_df, aes(x=polarity)) +
+  geom_bar(aes(y=..count.., fill=polarity)) +
+  scale_fill_brewer(palette="RdGy") +
+  labs(x="Categorías", y="Comentarios") +
+  
+  labs(title = "Análisis de Emociones para la mejora del docente\n(Clasificación de comentarios por polaridad)",
+       plot.title = element_text(size=12))
