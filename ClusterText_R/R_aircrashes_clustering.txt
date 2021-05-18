@@ -1,0 +1,135 @@
+#Cargando Librerias
+install.packages('tm')
+install.packages('proxy')
+install.packages('ggplot2')
+install.packages('wordcloud')
+install.packages("ape")
+install.packages("ggdendro")
+
+#TM: Paquete diseñado para el manejo de Corpus, en donde un Corpus es una colección de documentos
+library('tm')
+
+#PROXY: Paquete utilizado para calculos de distancias y similitudes
+library('proxy')
+
+#GGPLOT: Paquete para creación de visualizaciones
+library('ggplot2')
+
+#Paquete para la generación de nubes de palabras
+library('wordcloud')
+
+#Funcion de Ploteo Arboles Filogeneticos (Grafica de relaciones entre terminos)
+library("ape")
+
+#Para manejo de Dendrogramas
+library("ggdendro")
+
+
+#Cargando Archivo de Texto
+ds <- read.csv("D:/ClusterText/ac_data.csv",stringsAsFactors=FALSE)
+str(ds)
+dim(ds)
+
+#Transformando de Dataframe a Corpus
+#Vcorpus indica que es un corpus volatil es decir que solamente esta cargado en memoria
+report <- VCorpus(VectorSource(ds$Summary))
+report[[3]]$content
+report[[300]]$content
+print(report)
+report
+?SimpleCorpus
+?VCorpus
+
+#Limpiando nuestro Dataset
+  #a) Remover signos de puntuación y numeros:
+  report <- tm_map(report,removePunctuation)
+  report <- tm_map(report, removeNumbers)  
+  #b) Convertir todo a minusculas, algunos datos pueden ser KeySensitive
+  report <- tm_map(report,content_transformer(tolower))
+  #c) Remove “stopwords” (Palabras vacias o que aparentemente no tienen algun significado considerable):
+  report <- tm_map(report, removeWords, stopwords("english"))
+  #d) Multiples espacios en blanco seran colapsados a uno solo:
+  report <- tm_map(report, stripWhitespace)
+  #e) Lematizacion:  El lema es la forma que por convenio se acepta como representante de todas las formas flexionadas de una misma palabra.
+  report <- read.csv("D:/ClusterText/report_lemma.csv",stringsAsFactors=FALSE)
+  report <- VCorpus(VectorSource(report$Summary))
+
+#Estructurando la data por medio de una matriz: document-terms matrix
+dtm <- DocumentTermMatrix(report)
+dtm
+#dtmmtx <- as.matrix(dtm)
+
+#Identificando la frecuencia de cada termino
+freq <- colSums(as.matrix(dtm)) 
+str(freq)
+head(names(freq))
+head(freq)
+
+wf <- data.frame(word=names(freq),freq=freq)
+str(wf)
+head(wf)
+
+#Removiendo Terminos irrelevantes
+dtm <- DocumentTermMatrix(report,control=list(stopwords=c("aircraft","plane","crash","one","two","cause","make","kill","result","continue","contribute","take","flight","right","due","lead","factor","minute","leave")))
+
+#Sparsity: Ejemplo: Asumamos que hay 1000 documentos y que una palabra aparece 5 veces, la sparsity (dispersión) sera: 1-(5/1000)=1-0.005=0.995=99.5%
+#si el umbral de dispersión se establece en 0,90 este término se eliminará ya que su escasez (0,995) es mayor que el límite superior de escasez (0,90).
+dtms <- removeSparseTerms(dtm, 0.96)
+freq <- colSums(as.matrix(dtms)) 
+wf <- data.frame(word=names(freq),freq=freq)
+
+#Construyendo el grafico
+p <- ggplot(subset(wf),aes(word, freq))    
+p <- p + geom_bar(stat="identity")   
+p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
+p
+
+#Creando la nube de palabras
+wordcloud(names(freq),freq,scale=c(5,0.1),colors=brewer.pal(6,"Dark2")) 
+
+
+#***********
+# Clusterizacion basada en la similitud de los terminos
+#***********
+  #Construyendo Matriz de Distancias
+  #La distancia de Jaccard mide la disimilitud entre dos conjuntos de muestras y se define como el complemento del coeficiente de Jaccard
+dtms[dtms > 1] <- 1
+
+dtms
+
+dtms <- as.matrix(dtms)
+d <- dist(t(dtms), method = "Jaccard")
+d
+#Tecnica Aglomerativa de Clustering,es un acercamiento ascendente: cada observación comienza en su propio grupo, y los pares de grupos son mezclados mientras uno sube en la jerarquía.
+#Él Método de Ward es un criterio aplicado al Análisis de clúster jerárquico (Criterio de Varianza Mínima).
+hc <- hclust(d,method="ward.D")
+
+#Visualizando los clusters en 12 grupos
+plot(hc,hang=-1)
+rect.hclust(hc,k=12,border=2:4)
+
+hc
+
+
+plot(as.phylo(hc), type = "unrooted", cex = 0.6,
+     no.margin = TRUE)
+
+
+plot(as.phylo(hc), type = "fan")
+
+
+colors = c("red", "blue", "green", "black")
+clus4 = cutree(hc, 4)
+plot(as.phylo(hc), type = "fan", tip.color = colors[clus4],
+     label.offset = 0, cex = 0.7)
+
+dend <- as.dendrogram(hc)
+dend_data <- dendro_data(dend, type = "rectangle")
+ggdendrogram(hc)
+head(dend_data$segments)
+head(dend_data$labels)
+
+#Visualizando Correlaciones entre las palabras
+findAssocs(dtm,"weather",corlimit=0.1)
+findAssocs(dtm,"sea",corlimit=0.1)
+findAssocs(dtm,"fog",corlimit=0.1)
