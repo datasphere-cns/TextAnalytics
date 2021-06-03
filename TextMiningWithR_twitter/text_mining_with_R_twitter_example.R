@@ -15,20 +15,21 @@ library(dplyr)
 
 
 tweets_elon <- read_csv("D:/Workshop DataSphere/Data Profiling en Lenguaje R/Ejemplos/datos_tweets_@elonmusk.csv", col_names = TRUE)
-tweets_BillGates <- read_csv(file = "D:/Workshop DataSphere/Data Profiling en Lenguaje R/Ejemplos/datos_tweets_@BillGates.csv",col_names = TRUE)
+tweets_BillGates <- read_csv("D:/Workshop DataSphere/Data Profiling en Lenguaje R/Ejemplos/datos_tweets_@BillGates.csv",col_names = TRUE)
 tweets_mayoredlee <- read_csv( "D:/Workshop DataSphere/Data Profiling en Lenguaje R/Ejemplos/datos_tweets_@mayoredlee.csv", col_names = TRUE)
 
-# Unimos los tweets en un único dataframe
+# Unimos los tweets en un ?nico dataframe
 tweets <- bind_rows(tweets_elon, tweets_BillGates, tweets_mayoredlee)
 tweets %>% group_by(screen_name) %>% summarise(numero_tweets = n())
 
-#Listado de columas, vamos a determinar cuales vamos a usar para nuestro análisis.
+#Listado de columas, vamos a determinar cuales vamos a usar para nuestro an?lisis.
 colnames(tweets)
+dim(tweets)
 
-# Selección de variables
+# Selecci?n de variables
 tweets <- tweets %>% select(screen_name, created_at, status_id, text)
 
-# Se renombran las variables con nombres más prácticos
+# Se renombran las variables con nombres m?s pr?cticos
 tweets <- tweets %>% rename(autor = screen_name, fecha = created_at, texto = text, tweet_id = status_id)
 
 #Validar los cambios
@@ -37,41 +38,42 @@ head(tweets)
 
 
 
-##Limpieza de texto y tokenización
-#El proceso de limpieza de texto, dentro del ámbito de text mining, consiste en eliminar del 
-#texto todo aquello que no aporte información sobre su temática, estructura o contenido
 
-#Patrones no informativos (urls de páginas web)
-#Signos de puntuación
+##Limpieza de texto y tokenizaci?n
+#El proceso de limpieza de texto, dentro del ?mbito de text mining, consiste en eliminar del 
+#texto todo aquello que no aporte informaci?n sobre su tem?tica, estructura o contenido
+
+#Patrones no informativos (urls de p?ginas web)
+#Signos de puntuaci?n
 #Etiquetas HTML
 #Caracteres sueltos
-#Números
+#N?meros
 
 #Funcion para tokenizar el texto
 limpiar_tokenizar <- function(texto){
   
   # El orden de la limpieza no es arbitrario
   
-  # Se convierte todo el texto a minúsculas
+  # Se convierte todo el texto a min?sculas
   nuevo_texto <- tolower(texto)
   
   
-  # Eliminación de páginas web (palabras que empiezan por "http." seguidas de cualquier cosa que no sea un espacio)
+  # Eliminaci?n de p?ginas web (palabras que empiezan por "http." seguidas de cualquier cosa que no sea un espacio)
   nuevo_texto <- str_replace_all(nuevo_texto,"http\\S*", "")
   
-  # Eliminación de signos de puntuación
+  # Eliminaci?n de signos de puntuaci?n
   nuevo_texto <- str_replace_all(nuevo_texto,"[[:punct:]]", " ")
   
-  # Eliminación de números
+  # Eliminaci?n de n?meros
   nuevo_texto <- str_replace_all(nuevo_texto,"[[:digit:]]", " ")
   
-  # Eliminación de espacios en blanco múltiples
+  # Eliminaci?n de espacios en blanco m?ltiples
   nuevo_texto <- str_replace_all(nuevo_texto,"[\\s]+", " ")
   
-  # Tokenización por palabras individuales
+  # Tokenizaci?n por palabras individuales
   nuevo_texto <- str_split(nuevo_texto, " ")[[1]]
   
-  # Eliminación de tokens con una longitud < 2
+  # Eliminaci?n de tokens con una longitud < 2
   nuevo_texto <- keep(.x = nuevo_texto, .p = function(x){str_length(x) > 1})
   return(nuevo_texto)
 }
@@ -79,11 +81,11 @@ limpiar_tokenizar <- function(texto){
 test = "Este es 120 ejempl0 de l'limpieza de6 TEXTO  https://t.co/rnHPgyhx4Z @JoaquinAmatRodrigo #textmining"
 limpiar_tokenizar(texto = test)
 
-# Se aplica la función de limpieza y tokenización a cada tweet
+# Se aplica la funci?n de limpieza y tokenizaci?n a cada tweet
 tweets <- tweets %>% mutate(texto_tokenizado = map(.x = texto, .f = limpiar_tokenizar))
 tweets %>% select(texto_tokenizado) %>% head()
 
-#Gracias a la característica de las tibble de poder contener cualquier tipo de elemento en sus
+#Gracias a la caracter?stica de las tibble de poder contener cualquier tipo de elemento en sus
 #columnas (siempre que sea el mismo para toda la columna), se puede almacenar el texto
 #tokenizado. Cada elemento de la columna texto_tokenizado es una lista con un vector de tipo
 #character que contiene los tokens generados
@@ -92,22 +94,22 @@ tweets %>% select(texto_tokenizado) %>% head()
 tweets %>% slice(1) %>% select(texto_tokenizado) %>% pull()
 
 tweets
-#Análisis exploratorio de Datos - EDA 
+#An?lisis exploratorio de Datos - EDA 
 
-#En R, las estructuras por excelencia para el análisis exploratorio son el DataFrame y la
-#Tibble, que es la forma en la que se encuentra almacenada ahora la información de los tweets.
+#En R, las estructuras por excelencia para el an?lisis exploratorio son el DataFrame y la
+#Tibble, que es la forma en la que se encuentra almacenada ahora la informaci?n de los tweets.
 
-#Previamente a la división del texto, los elementos de estudio (observaciones) eran los tweets, y cada uno se
-#encontraba en una fila, cumplimento así la condición de tidy data: una observación, una fila
+#Previamente a la divisi?n del texto, los elementos de estudio (observaciones) eran los tweets, y cada uno se
+#encontraba en una fila, cumplimento as? la condici?n de tidy data: una observaci?n, una fila
 
-#Al realizar la tokenización, el elemento de estudio ha pasado a ser cada token (palabra)
-#Debemos duplicar el valor de las otras columnas tantas veces como sea necesario. Ha este proceso se le conoce como expansión o unnest
+#Al realizar la tokenizaci?n, el elemento de estudio ha pasado a ser cada token (palabra)
+#Debemos duplicar el valor de las otras columnas tantas veces como sea necesario. Ha este proceso se le conoce como expansi?n o unnest
 
 tweets_tidy <- tweets %>% select(-texto) %>% unnest()
 tweets_tidy <- tweets_tidy %>% rename(token = texto_tokenizado)
 head(tweets_tidy)
 
-#Distribución temporal de los tweets
+#Distribuci?n temporal de los tweets
 install.packages("lubridate")  
 library(lubridate)
 
@@ -117,7 +119,7 @@ library(lubridate)
 ggplot(tweets, aes(x = as.Date(fecha), fill = autor)) +
   geom_histogram(position = "identity", bins = 20, show.legend = FALSE) +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "5 month") +
-  labs(x = "fecha de publicación", y = "número de tweets") +
+  labs(x = "fecha de publicaci?n", y = "n?mero de tweets") +
   facet_wrap(~ autor, ncol = 1) +
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90))
@@ -128,8 +130,8 @@ tweets_mes_anyo <- tweets %>% mutate(mes_anyo = format(fecha, "%Y-%m"))
 tweets_mes_anyo %>% group_by(autor, mes_anyo) %>% summarise(n = n()) %>%
   ggplot(aes(x = mes_anyo, y = n, color = autor)) +
   geom_line(aes(group = autor)) +
-  labs(title = "Número de tweets publicados", x = "fecha de publicación",
-       y = "número de tweets") +
+  labs(title = "N?mero de tweets publicados", x = "fecha de publicaci?n",
+       y = "n?mero de tweets") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, size = 6),
         legend.position = "bottom")
@@ -171,14 +173,14 @@ tweets_tidy %>% group_by(autor, tweet_id) %>% summarise(longitud = n()) %>%
   coord_flip() + theme_bw()
 
 
-#Palabras más utilizadas por usuario
+#Palabras m?s utilizadas por usuario
 
 tweets_tidy %>% group_by(autor, token) %>% count(token) %>% group_by(autor) %>%
   top_n(15, n) %>% arrange(autor, desc(n)) %>% print(n=45)
 
 
 #Stop words
-#Son preposiciones, pronombres., en general, palabras que no aportan información relevante sobre el texto
+#Son preposiciones, pronombres., en general, palabras que no aportan informaci?n relevante sobre el texto
 
 
 
@@ -203,14 +205,14 @@ lista_stopwords <- c('me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves',
                      'shouldn', 'wasn', 'weren', 'won', 'wouldn','i')
 
 
-#En la tabla anterior aparece el término amp que procede de la etiqueta html &amp
-# Se añade el término amp al listado de stopwords
+#En la tabla anterior aparece el t?rmino amp que procede de la etiqueta html &amp
+# Se a?ade el t?rmino amp al listado de stopwords
 lista_stopwords <- c(lista_stopwords, "amp")
 
 # Se filtran las stopwords
 tweets_tidy <- tweets_tidy %>% filter(!(token %in% lista_stopwords))
 
-#Representación gráfica de las frecuencias
+#Representaci?n gr?fica de las frecuencias
 tweets_tidy %>% group_by(autor, token) %>% count(token) %>% group_by(autor) %>%
   top_n(10, n) %>% arrange(autor, desc(n)) %>%
   ggplot(aes(x = reorder(token,n), y = n, fill = autor)) +
@@ -223,7 +225,7 @@ tweets_tidy %>% group_by(autor, token) %>% count(token) %>% group_by(autor) %>%
 
 
 #Word Clouds
-#Otra forma visual de representar las palabras más frecuentes es mediante nubes de palabras
+#Otra forma visual de representar las palabras m?s frecuentes es mediante nubes de palabras
 
 
 library(wordcloud)
@@ -243,7 +245,7 @@ df_grouped <- tweets_tidy %>% group_by(autor, token) %>% count(token) %>%
 walk2(.x = df_grouped$autor, .y = df_grouped$data, .f = wordcloud_custom)
 
 
-#Correlación entre usuarios por palabras utilizadas
+#Correlaci?n entre usuarios por palabras utilizadas
 
 library(gridExtra)
 library(scales)
@@ -283,16 +285,16 @@ grid.arrange(p1, p2, nrow = 1)
 palabras_comunes <- dplyr::intersect(tweets_tidy %>% filter(autor=="elonmusk") %>%
                                        select(token), tweets_tidy %>% filter(autor=="mayoredlee") %>%
                                        select(token)) %>% nrow()
-paste("Número de palabras comunes entre Elon Musk y Ed Lee", palabras_comunes)
+paste("N?mero de palabras comunes entre Elon Musk y Ed Lee", palabras_comunes)
 
 #Cantidad de palabras comunes entre Elon Musk & Bill Gates
 palabras_comunes <- dplyr::intersect(tweets_tidy %>% filter(autor=="elonmusk") %>%
                                        select(token), tweets_tidy %>% filter(autor=="BillGates") %>%
                                        select(token)) %>% nrow()
-paste("Número de palabras comunes entre Elon Musk y Bill Gates", palabras_comunes)
+paste("N?mero de palabras comunes entre Elon Musk y Bill Gates", palabras_comunes)
 
 ----------------------------------
-#Comparación en el uso de palabras
+#Comparaci?n en el uso de palabras
 
 # Pivotaje y despivotaje
 tweets_spread <- tweets_tidy %>% group_by(autor, token) %>% count(token) %>%
@@ -301,10 +303,10 @@ tweets_unpivot <- tweets_spread %>% gather(key = "autor", value = "n", -token)
 
 
 
-# Selección de los autores elonmusk y mayoredlee
+# Selecci?n de los autores elonmusk y mayoredlee
 tweets_unpivot <- tweets_unpivot %>% filter(autor %in% c("elonmusk",
                                                          "mayoredlee"))
-# Se añade el total de palabras de cada autor
+# Se a?ade el total de palabras de cada autor
 tweets_unpivot <- tweets_unpivot %>% left_join(tweets_tidy %>%
                                                  group_by(autor) %>%
                                                  summarise(N = n()),
@@ -312,7 +314,7 @@ tweets_unpivot <- tweets_unpivot %>% left_join(tweets_tidy %>%
 
 
 
-# Cálculo de odds y log of odds de cada palabra
+# C?lculo de odds y log of odds de cada palabra
 tweets_logOdds <- tweets_unpivot %>% mutate(odds = (n + 1) / (N + 1))
 tweets_logOdds <- tweets_logOdds %>% select(autor, token, odds) %>%
   spread(key = autor, value = odds)
@@ -322,7 +324,7 @@ tweets_logOdds <- tweets_logOdds %>% mutate(log_odds = log(elonmusk/mayoredlee),
 
 
 # Si el logaritmo de odds es mayor que cero, significa que es una palabra con
-# mayor probabilidad de ser de Elon Musk. Esto es así porque el ratio sea ha
+# mayor probabilidad de ser de Elon Musk. Esto es as? porque el ratio sea ha
 # calculado como elonmusk/mayoredlee.
 tweets_logOdds <- tweets_logOdds %>%
   mutate(autor_frecuente = if_else(log_odds > 0,
@@ -333,7 +335,7 @@ tweets_logOdds %>% arrange(desc(abs_log_odds)) %>% head()
 
 
 
-#Representación de las 30 palabras más diferenciadas
+#Representaci?n de las 30 palabras m?s diferenciadas
 tweets_logOdds %>% group_by(autor_frecuente) %>% top_n(15, abs_log_odds) %>%
   ggplot(aes(x = reorder(token, log_odds), y = log_odds, fill = autor_frecuente)) +
   geom_col() +
@@ -344,42 +346,42 @@ tweets_logOdds %>% group_by(autor_frecuente) %>% top_n(15, abs_log_odds) %>%
 
 
 
-#Relación entre palabras
-#En todos los análisis anteriores, se han considerado a las palabras como unidades
-#individuales e independientes. Esto es una simplificación bastante grande, ya que en realidad
+#Relaci?n entre palabras
+#En todos los an?lisis anteriores, se han considerado a las palabras como unidades
+#individuales e independientes. Esto es una simplificaci?n bastante grande, ya que en realidad
 #el lenguaje se crea por combinaciones no aleatorias de palabras, es decir, determinadas
-#palabras tienden a utilizarse de forma conjunta. A continuación se muestran algunas formas de
+#palabras tienden a utilizarse de forma conjunta. A continuaci?n se muestran algunas formas de
 #calcular, identificar y visualizar relaciones entre palabras
 
-#La función unnest_tokens() del paquete tidytext permite dividir el texto por ngramas, 
+#La funci?n unnest_tokens() del paquete tidytext permite dividir el texto por ngramas, 
 #siendo cada n-grama una secuencia de n palabras consecutivas. 
-#Para conseguir los ngramas, tiene que ser la función unnest_tokens() la que divida 
-#el texto, por lo que se elimina la tokenización de la función limpiar_tokenizar
+#Para conseguir los ngramas, tiene que ser la funci?n unnest_tokens() la que divida 
+#el texto, por lo que se elimina la tokenizaci?n de la funci?n limpiar_tokenizar
 
 install.packages("tidytext")
 library(tidytext)
 
 limpiar <- function(texto){
   # El orden de la limpieza no es arbitrario
-  # Se convierte todo el texto a minúsculas
+  # Se convierte todo el texto a min?sculas
     nuevo_texto <- tolower(texto)
     
-  # Eliminación de páginas web (palabras que empiezan por "http." seguidas
+  # Eliminaci?n de p?ginas web (palabras que empiezan por "http." seguidas
   # de cualquier cosa que no sea un espacio)
     nuevo_texto <- str_replace_all(nuevo_texto,"http\\S*", "")
     
-  # Eliminación de signos de puntuación
+  # Eliminaci?n de signos de puntuaci?n
   nuevo_texto <- str_replace_all(nuevo_texto,"[[:punct:]]", " ")
   
-  # Eliminación de números
+  # Eliminaci?n de n?meros
   nuevo_texto <- str_replace_all(nuevo_texto,"[[:digit:]]", " ")
   
-  # Eliminación de espacios en blanco múltiples
+  # Eliminaci?n de espacios en blanco m?ltiples
   nuevo_texto <- str_replace_all(nuevo_texto,"[\\s]+", " ")
   return(nuevo_texto)
 }
 
-#Creación de bigramas de palabras
+#Creaci?n de bigramas de palabras
 
 bigramas <- tweets %>% mutate(texto = limpiar(texto)) %>%
   select(texto) %>%
@@ -390,8 +392,8 @@ bigramas <- tweets %>% mutate(texto = limpiar(texto)) %>%
 bigramas %>% count(bigrama, sort = TRUE)
 
 
-#Los bigramas más frecuentes son los formados por stopwords. Como la relación entre estas
-#palabras no aporta información de interés, se procede a eliminar todos aquellos bigramas que
+#Los bigramas m?s frecuentes son los formados por stopwords. Como la relaci?n entre estas
+#palabras no aporta informaci?n de inter?s, se procede a eliminar todos aquellos bigramas que
 #contienen alguna stopword.
 
 
@@ -407,18 +409,18 @@ bigrams_separados <- bigrams_separados %>%
   filter(!palabra1 %in% lista_stopwords) %>%
   filter(!palabra2 %in% lista_stopwords)
 
-# Unión de las palabras para formar de nuevo los bigramas
+# Uni?n de las palabras para formar de nuevo los bigramas
 bigramas <- bigrams_separados %>%
   unite(bigrama, palabra1, palabra2, sep = " ")
 
-# Nuevo contaje para identificar los bigramas más frecuentes
+# Nuevo contaje para identificar los bigramas m?s frecuentes
 bigramas %>% count(bigrama, sort = TRUE) %>% print(n = 20)
 
 
-#Una forma más visual e informativa de analizar las relaciones entre palabras es
+#Una forma m?s visual e informativa de analizar las relaciones entre palabras es
 #mediante el uso de networks. El paquete igraph permite crear networks a partir de
 #dataframes que tenga una estructura de columnas de tipo: elemento_A, elemento_B,
-#conexión.
+#conexi?n.
 
 
 install.packages("igraph")
@@ -440,7 +442,7 @@ plot(graph, vertex.label.font = 2,
 
 
 
-#Con el paquete ggraph se pueden generar representaciones gráficas de networks basadas en
+#Con el paquete ggraph se pueden generar representaciones gr?ficas de networks basadas en
 #ggplot2.
 
 

@@ -47,7 +47,7 @@ report
   #b) Convertir todo a minusculas, algunos datos pueden ser KeySensitive
   report <- tm_map(report,content_transformer(tolower))
   #c) Remove “stopwords” (Palabras vacias o que aparentemente no tienen algun significado considerable):
-  report <- tm_map(report, removeWords, stopwords("english"))
+  report <- tm_map(report, removeWords, stopwords("spanish"))
   #d) Multiples espacios en blanco seran colapsados a uno solo:
   report <- tm_map(report, stripWhitespace)
   #e) Lematizacion:  El lema es la forma que por convenio se acepta como representante de todas las formas flexionadas de una misma palabra.

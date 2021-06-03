@@ -1,3 +1,5 @@
+install.packages("sentiment")
+
 library(quanteda)
 library(e1071)
 library(NLP)
@@ -10,9 +12,10 @@ library(sentiment)
 library(ggplot2)
 library(wordcloud)
 
-#Limpieza
 
-corpus <- read.csv('data/OriginalCorpus.csv')
+
+#Limpieza
+corpus <- read.csv("data/OriginalCorpus.csv")
 corpus$opinar
 
 corpus <- laply(corpus$text, function(sentence){
