@@ -4,6 +4,8 @@ library(knitr)
 library(tidyverse)
 library(dplyr)
 library(readr)
+install.packages("ggplot2")
+library(ggplot2)
 
 #-------------------------------------------------------------------------
 ##---- Cargamos los datos especificando los tipos de datos de cada columna 
@@ -92,7 +94,7 @@ tweets_AFPCrecer<- read_csv( "D:/Github/Datasphere/TextAnalytics/SocialNetwork/U
                                                                  TweetSource = col_character()))
 
 
-
+head(tweets_AFPCrecer)
 head(tweets_AFPCrecer)
 dim(tweets_AFPCrecer)
 str(tweets_AFPCrecer)
@@ -141,7 +143,7 @@ colnames(tweetsbind)
 
 #-------------------------------------------------------------------------
 # Selección de variables
-tweetsbind <- tweetsbind %>% select(Username, Date, TweetText, TweetSource , account, TweetSource)
+tweetsbind <- tweetsbind %>% select(Username, Date, TweetText, TweetSource , account)
 
 
 #-------------------------------------------------------------------------
@@ -155,7 +157,7 @@ tweetsbind %>% group_by(empresa) %>% summarise(numero_tweets = n())
 #Excluir cuentas raíz del community manager de cada empresa
 tweetsbind <- tweetsbind[ !(tweetsbind$autor %in% c('AFPCrecer', 'BancoCUSCATLAN_','BACCredomaticSV','AFPCONFIA' )), ]
 
-
+head(tweetsbind)
 
 
 #-------------------------------------------------------------------------
@@ -293,9 +295,16 @@ tweets_tidyCuscatlan <- filter(tweets_tidy, empresa=='Cuscatlan')
 
 #-------------Nube de palabra para cada empresa
 dfgrouped_AFPcrecer <-  tweets_tidyAFPcrecer %>%  group_by(token) %>% summarize(m = n()) %>%  ungroup()
+dfgrouped_AFPconfia <-  tweets_tidyAFPconfia %>%  group_by(token) %>% summarize(m = n()) %>%  ungroup()
+
 head(dfgrouped_AFPcrecer)
 
 wordcloud(words = dfgrouped_AFPcrecer$token, freq = dfgrouped_AFPcrecer$m, min.freq = 1, 
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+wordcloud(words = dfgrouped_AFPconfia$token, freq = dfgrouped_AFPconfia$m, min.freq = 1, 
           max.words=100, random.order=FALSE, rot.per=0.35, 
           colors=brewer.pal(8, "Dark2"))
 
@@ -386,6 +395,7 @@ limpiar <- function(texto){
 ####-------------------------------------------
 str(tweets_AFPCrecer)
 dim(tweets_AFPCrecer)
+
 
 # Selección de variables
 df_AFPCrecerbigrama <- tweets_AFPCrecer %>% select(Username, Date, TweetText, TweetSource , account, TweetSource)
