@@ -63,8 +63,8 @@ instagram_AFPConfia <- cbind(instagram_AFPConfia, account= c("AFPConfia"))
 #-------------------------------------------------------------------------
 
 #Top 10 de usuario que m?s twitean respectivamente a cada cuenta de las que se est?n analizando
-instagram_AFPCrecer %>% group_by(Name) %>% summarise(numero_comentarios = n()) %>% top_n(10, numero_comentarios) %>%  arrange(desc(numero_comentarios)) 
-instagram_AFPConfia %>% group_by(Name) %>% summarise(numero_comentarios = n()) %>% top_n(10, numero_comentarios) %>% arrange(desc(numero_comentarios))
+instagram_AFPCrecer %>% group_by(Name) %>% summarise(numero_comentarios = n()) %>% top_n(10, Name) %>%  arrange(desc(numero_comentarios)) 
+instagram_AFPConfia %>% group_by(Name) %>% summarise(numero_comentarios = n()) %>% top_n(10, Name) %>% arrange(desc(numero_comentarios))
 
 
 #-------------------------------------------------------------------------

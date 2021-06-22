@@ -38,6 +38,7 @@ afinn <- read.csv("lexico_afinn.en.es.csv", stringsAsFactors = F, fileEncoding =
 str(tuits)
 str(afinn)
 
+
 ## Preparando los datos
 ## Manipulamos la columna created_at con la función separate() de tidyr.
 ## Separamos esta columna en una fecha y hora del día, y después separaremos la 
@@ -78,6 +79,8 @@ tuits_afinn <-
 
 str(afinn)
 str(tuits_afinn)
+head(tuits_afinn)
+
 ## Obtenemos también una puntuación por tuit, usando group_by() y summarise() de 
 ## dplyr, y le agregamos tuits para usarla después. Tambien asignamos a los tuits
 ## sin puntuación positiva o negativa un valor de 0, que indica neutralidad. 
@@ -137,6 +140,7 @@ tuits_afinn_fecha <-
   group_by(Candidato, Fecha) %>%
   summarise(Media = mean(Puntuacion))
 
+head(tuits_afinn)
 ## Veamos nuestros resultados con ggplot()
 
 tuits_afinn_fecha %>%
