@@ -125,7 +125,7 @@ ggplot(sent_df_crecer, aes(x=polarity)) +
   scale_fill_brewer(palette="RdGy") +
   labs(x="Categorías", y="Comentarios") +
   
-  labs(title = "Análisis de Emociones para la mejora del docente\n(Clasificación de comentarios por polaridad)",
+  labs(title = "Análisis de Emociones - Instagram - Crecer \n(Clasificación de comentarios por polaridad)",
        plot.title = element_text(size=12))
 
 
@@ -165,7 +165,7 @@ polarity = class_pol[,4]
 sent_df_confia = data.frame(text=corpusConfia, emotion=emotion,polarity=polarity, stringsAsFactors=FALSE)
 
 #Ordenando el Dataframe
-sent_df_confia = within(sent_df,emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
+sent_df_confia = within(sent_df_confia,emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
 
 
 # Grafico de sentimientos
@@ -174,7 +174,7 @@ ggplot(sent_df_confia, aes(x=polarity)) +
   scale_fill_brewer(palette="RdGy") +
   labs(x="Categorías", y="Comentarios") +
   
-  labs(title = "Análisis de Emociones para la mejora del docente\n(Clasificación de comentarios por polaridad)",
+  labs(title = "Análisis de Emociones - Instagram - Confia \n(Clasificación de comentarios por polaridad)",
        plot.title = element_text(size=12))
 
 ##Exportación del DF con el resultado del analisis de sentimientos según bayes

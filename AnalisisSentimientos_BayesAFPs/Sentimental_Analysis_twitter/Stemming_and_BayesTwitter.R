@@ -74,7 +74,7 @@ for(i in 1:322) {
 head(tuitcrecer, n=11)
 
 ##Exportamos el dataset ya Lematizado
-write.csv(textcrecer,"D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_twitter/STEMMINGtwitter_AFPcrecer.csv", row.names = FALSE)
+write.csv(tuitcrecer,"D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_twitter/STEMMINGtwitter_AFPcrecer.csv", row.names = FALSE)
 
 
 ###---------------
@@ -86,9 +86,9 @@ write.csv(textcrecer,"D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_Ba
 library(NLP)
 library(ggplot2)
 library(tm)
-source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_facebook/classify_polarity.R')
-source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_facebook/create_matrix.R')
-source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_facebook/classify_emotion.R')
+source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_twitter/classify_polarity.R')
+source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_twitter/create_matrix.R')
+source('D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_twitter/classify_emotion.R')
 
 corpusCrecer <- read.csv("STEMMINGtwitter_AFPcrecer.csv")
 head(corpusCrecer)
@@ -125,7 +125,7 @@ ggplot(sent_df_crecer, aes(x=polarity)) +
   scale_fill_brewer(palette="RdGy") +
   labs(x="Categorías", y="Comentarios") +
   
-  labs(title = "Análisis de Emociones para la mejora del docente\n(Clasificación de comentarios por polaridad)",
+  labs(title = "Análisis de Emociones - twitter - AFP Crecer\n(Clasificación de comentarios por polaridad)",
        plot.title = element_text(size=12))
 
 
@@ -165,7 +165,7 @@ polarity = class_pol[,4]
 sent_df_confia = data.frame(text=corpusConfia, emotion=emotion,polarity=polarity, stringsAsFactors=FALSE)
 
 #Ordenando el Dataframe
-sent_df_confia = within(sent_df,emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
+sent_df_confia = within(sent_df_confia,emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
 
 
 # Grafico de sentimientos
@@ -174,7 +174,7 @@ ggplot(sent_df_confia, aes(x=polarity)) +
   scale_fill_brewer(palette="RdGy") +
   labs(x="Categorías", y="Comentarios") +
   
-  labs(title = "Análisis de Emociones para la mejora del docente\n(Clasificación de comentarios por polaridad)",
+  labs(title = "Análisis de Emociones - twitter - AFP Confía\n(Clasificación de comentarios por polaridad)",
        plot.title = element_text(size=12))
 
 ##Exportación del DF con el resultado del analisis de sentimientos según bayes
