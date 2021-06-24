@@ -101,7 +101,7 @@ result
 
 
 
-filePath <- "/Users/nelsonzepeda/Desktop/Datasphere/TextAnalytics-main/Stemming/TelcosSV/CLARO_STEM_202006_1500.csv"
+filePath <- "D:/Github/Datasphere/TextAnalytics/AnalisisSentimientos_BayesAFPs/Sentimental_Analysis_facebook/AFPConfiaFacebook.csv"
 text <- read.table(filePath, header = TRUE, sep = "|")
 str(text)
 
@@ -117,7 +117,7 @@ head(text)
 nrow(text)
 
 
-for(i in 1:nrow(text)) {
+for(i in 1:100) {
 
   text[i,3]<-sapply(text_tokens(text[i,2], stemmer = stem_list), paste, collapse=" ")
   }

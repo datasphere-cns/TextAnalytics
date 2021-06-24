@@ -292,16 +292,6 @@ tuits_afinn %>%
   facet_wrap(~Candidato) +
   tema_graf
 
-## Por supuesto, también podemos observar las tendencias a través del tiempo 
-## usando facet_grid() para crear una cuadrícula de gráficas, con los 
-## candidatos en el eje x y los meses en el eje y.
-
-tuits_afinn %>%
-  ggplot() +
-  aes(Puntuacion, color = Candidato) +
-  geom_density() +
-  facet_grid(Candidato~Mes) +
-  tema_graf
 
 
 

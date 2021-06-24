@@ -22,8 +22,7 @@ polarity = class_pol[,4]
  sent_df = data.frame(text=corpus2, emotion=emotion,polarity=polarity, stringsAsFactors=FALSE)
 
  #Ordenando el Dataframe
-sent_df = within(sent_df,
-emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
+sent_df = within(sent_df,emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
 
 
 # Grafico de sentimientos
