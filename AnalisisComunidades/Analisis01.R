@@ -1,4 +1,4 @@
-install.packages("tidyverse")
+install.packages("tidyverse") 
 library(tidyverse)
 edge_list <- tibble(from = c(1, 2, 2, 3, 4), to = c(2, 3, 4, 2, 1))
 node_list <- tibble(id = 1:4)
