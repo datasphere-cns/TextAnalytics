@@ -1,0 +1,8 @@
+{
+    "aka": "Moview Review Data",
+    "authors": "Bo Pang and Lillian Lee",
+    "bibtex": "@InProceedings{Pang+Lee:04a,\n  author =       {Bo Pang and Lillian Lee},\n  title =        {A Sentimental Education: Sentiment Analysis Using Subjectivity Summarization Based on Minimum Cuts},\n  booktitle =    \"Proceedings of the ACL\",\n  year =         2004\n}",
+    "license": "Distributed with NLTK with permission from the authors.",
+    "source": "http://www.cs.cornell.edu/people/pabo/movie-review-data/",
+    "title": "Sentiment Polarity Dataset Version 2.0"
+}
