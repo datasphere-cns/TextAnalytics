@@ -1,0 +1,6 @@
+[1] "DOCUMENT 1"
+[1] "WORD: excelente CAT: positive POL: strongsubj SCORE: 6.71659477352098"
+[1] "POS: 7.66293785046153 NEG: 0.492818307011907 RATIO: 15.5492150787255"
+
+[1] "Positivos:  1 Negativos:  0 Neutrales:  0"
+
